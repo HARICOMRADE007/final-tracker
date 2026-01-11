@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Session } from '@supabase/supabase-js';
-import { LogOut } from 'lucide-react';
+import { LogOut, Download } from 'lucide-react';
 import { supabase } from './lib/supabase';
 import Login from './components/Login';
 import type { Expense, ExpenseFilters, ExpenseCategory } from './types/expense';
@@ -14,9 +14,12 @@ import { filterExpenses, getTotal, getTodayTotal } from './utils/helpers';
 
 const THEME_KEY = 'expense-tracker-theme';
 
+import LandingPage from './components/LandingPage';
+
 function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showLogin, setShowLogin] = useState(false); // New state for Landing Page
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [filters, setFilters] = useState<ExpenseFilters>({});
   const [isDark, setIsDark] = useState(false);
@@ -184,7 +187,20 @@ function App() {
   }
 
   if (!session || session.user.role !== 'authenticated') {
-    return <Login isDark={isDark} />;
+    if (showLogin) {
+      return (
+        <div className="relative">
+          <button
+            onClick={() => setShowLogin(false)}
+            className={`absolute top-4 left-4 z-50 p-2 rounded-full ${isDark ? 'text-white hover:bg-gray-800' : 'text-gray-600 hover:bg-gray-100'}`}
+          >
+            Back
+          </button>
+          <Login isDark={isDark} />
+        </div>
+      );
+    }
+    return <LandingPage onGetStarted={() => setShowLogin(true)} isDark={isDark} />;
   }
 
   return (
@@ -233,14 +249,29 @@ function App() {
           </div>
 
           <div className="lg:col-span-2 space-y-6 sm:space-y-8">
-            <DashboardStats
-              total={totalExpenses}
-              todayTotal={todayExpenses}
-              expenseCount={filteredExpenses.length}
-              isDark={isDark}
-            />
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+                <Filters filters={filters} onFilterChange={setFilters} isDark={isDark} />
 
-            <Filters filters={filters} onFilterChange={setFilters} isDark={isDark} />
+                <button
+                  onClick={() => import('./utils/export').then(mod => mod.exportToExcel(filteredExpenses, `expenses-${new Date().toISOString().split('T')[0]}.xlsx`))}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-300 ${isDark
+                    ? 'bg-green-600/20 text-green-400 hover:bg-green-600/30 border-green-500/30'
+                    : 'bg-green-50 text-green-600 hover:bg-green-100 border-green-200'
+                    } border shadow-sm hover:scale-105 active:scale-95`}
+                >
+                  <Download size={18} />
+                  <span className="font-medium">Export Excel</span>
+                </button>
+              </div>
+
+              <DashboardStats
+                total={totalExpenses}
+                todayTotal={todayExpenses}
+                expenseCount={filteredExpenses.length}
+                isDark={isDark}
+              />
+            </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div
