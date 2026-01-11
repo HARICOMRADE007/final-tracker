@@ -48,7 +48,7 @@ function App() {
         .from('expenses')
         .select('*')
         .order('createdAt', { ascending: true });
-      
+
       if (error) {
         console.error('Error fetching expenses:', error);
       } else {
@@ -58,8 +58,11 @@ function App() {
 
     fetchExpenses();
 
+    // Debugging: Log subscription attempt
+    console.log('Attempting to subscribe to expenses for user:', session.user.id);
+
     const subscription = supabase
-      .channel('expenses_channel')
+      .channel('expenses_realtime')
       .on(
         'postgres_changes',
         {
@@ -69,8 +72,13 @@ function App() {
           filter: `user_id=eq.${session.user.id}`,
         },
         (payload) => {
+          console.log('Realtime event received:', payload); // Debug log
           if (payload.eventType === 'INSERT') {
-            setExpenses((prev) => [...prev, payload.new as Expense]);
+            setExpenses((prev) => {
+              // Prevent duplicate insertion from optimistic update
+              if (prev.some(e => e.id === payload.new.id)) return prev;
+              return [...prev, payload.new as Expense];
+            });
           } else if (payload.eventType === 'DELETE') {
             setExpenses((prev) => prev.filter((expense) => expense.id !== payload.old.id));
           } else if (payload.eventType === 'UPDATE') {
@@ -82,26 +90,15 @@ function App() {
           }
         }
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        console.log('Subscription status:', status);
+        if (err) console.error('Subscription error:', err);
+      });
 
     return () => {
       subscription.unsubscribe();
     };
   }, [session]);
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem(THEME_KEY);
-    if (savedTheme) {
-      setIsDark(savedTheme === 'dark');
-    } else {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setIsDark(prefersDark);
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
-  }, [isDark]);
 
   const addExpense = async (expenseData: {
     amount: number;
@@ -111,27 +108,43 @@ function App() {
   }) => {
     if (!session?.user) return;
 
-    const newExpense = {
+    // 1. Optimistic Update (Immediate Feedback)
+    const tempId = crypto.randomUUID();
+    const newExpense: Expense = {
       ...expenseData,
+      id: tempId, // Temporary ID, will be replaced by real ID from DB if we were refetching, but subscription handles it
       user_id: session.user.id,
       createdAt: Date.now(),
     };
 
+    setExpenses((prev) => [...prev, newExpense]);
+
+    // 2. Database Insert
+    // We insert a cleaned object without the ID if we want DB to generate it, 
+    // OR we generate a valid UUID here. We are generating one.
     const { error } = await supabase.from('expenses').insert([newExpense]);
 
     if (error) {
       console.error('Error adding expense:', error);
       alert('Failed to add expense. Please try again.');
+      // Rollback optimistic update on error
+      setExpenses((prev) => prev.filter((e) => e.id !== tempId));
     }
-    // Optimistic update is handled by subscription, but we could add it here too if latency is high.
-    // For now, relying on subscription to keep it simple and perfectly synced.
   };
 
   const deleteExpense = async (id: string) => {
+    // 1. Optimistic Update
+    const prevExpenses = [...expenses];
+    setExpenses((prev) => prev.filter((e) => e.id !== id));
+
+    // 2. Database Delete
     const { error } = await supabase.from('expenses').delete().eq('id', id);
+
     if (error) {
       console.error('Error deleting expense:', error);
       alert('Failed to delete expense.');
+      // Rollback
+      setExpenses(prevExpenses);
     }
   };
 
