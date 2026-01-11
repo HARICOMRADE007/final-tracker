@@ -12,7 +12,6 @@ import ThemeToggle from './components/ThemeToggle';
 import { CategoryPieChart, CategoryBarChart, TrendLineChart } from './components/Charts';
 import { filterExpenses, getTotal, getTodayTotal } from './utils/helpers';
 
-const STORAGE_KEY = 'expense-tracker-data';
 const THEME_KEY = 'expense-tracker-theme';
 
 function App() {
@@ -37,16 +36,60 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Fetch expenses and subscribe to changes
   useEffect(() => {
-    const savedExpenses = localStorage.getItem(STORAGE_KEY);
-    if (savedExpenses) {
-      try {
-        setExpenses(JSON.parse(savedExpenses));
-      } catch (e) {
-        console.error('Failed to parse expenses from localStorage', e);
-      }
+    if (!session?.user) {
+      setExpenses([]);
+      return;
     }
 
+    const fetchExpenses = async () => {
+      const { data, error } = await supabase
+        .from('expenses')
+        .select('*')
+        .order('createdAt', { ascending: true });
+      
+      if (error) {
+        console.error('Error fetching expenses:', error);
+      } else {
+        setExpenses(data || []);
+      }
+    };
+
+    fetchExpenses();
+
+    const subscription = supabase
+      .channel('expenses_channel')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'expenses',
+          filter: `user_id=eq.${session.user.id}`,
+        },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            setExpenses((prev) => [...prev, payload.new as Expense]);
+          } else if (payload.eventType === 'DELETE') {
+            setExpenses((prev) => prev.filter((expense) => expense.id !== payload.old.id));
+          } else if (payload.eventType === 'UPDATE') {
+            setExpenses((prev) =>
+              prev.map((expense) =>
+                expense.id === payload.new.id ? (payload.new as Expense) : expense
+              )
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [session]);
+
+  useEffect(() => {
     const savedTheme = localStorage.getItem(THEME_KEY);
     if (savedTheme) {
       setIsDark(savedTheme === 'dark');
@@ -57,29 +100,39 @@ function App() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
-  }, [expenses]);
-
-  useEffect(() => {
     localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
   }, [isDark]);
 
-  const addExpense = (expenseData: {
+  const addExpense = async (expenseData: {
     amount: number;
     category: ExpenseCategory;
     date: string;
     note?: string;
   }) => {
-    const newExpense: Expense = {
+    if (!session?.user) return;
+
+    const newExpense = {
       ...expenseData,
-      id: crypto.randomUUID(),
+      user_id: session.user.id,
       createdAt: Date.now(),
     };
-    setExpenses((prev) => [...prev, newExpense]);
+
+    const { error } = await supabase.from('expenses').insert([newExpense]);
+
+    if (error) {
+      console.error('Error adding expense:', error);
+      alert('Failed to add expense. Please try again.');
+    }
+    // Optimistic update is handled by subscription, but we could add it here too if latency is high.
+    // For now, relying on subscription to keep it simple and perfectly synced.
   };
 
-  const deleteExpense = (id: string) => {
-    setExpenses((prev) => prev.filter((e) => e.id !== id));
+  const deleteExpense = async (id: string) => {
+    const { error } = await supabase.from('expenses').delete().eq('id', id);
+    if (error) {
+      console.error('Error deleting expense:', error);
+      alert('Failed to delete expense.');
+    }
   };
 
   const toggleTheme = () => {
@@ -114,13 +167,13 @@ function App() {
         : 'bg-gradient-to-br from-blue-50 via-white to-green-50'
         }`}
     >
-      <div className="absolute top-4 right-4 flex gap-4">
+      <div className="absolute top-4 right-4 flex items-center gap-4 z-50">
         <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
         <button
           onClick={handleLogout}
           className={`p-2 rounded-full backdrop-blur-md transition-all duration-300 ${isDark
-            ? 'bg-gray-800/50 text-gray-400 hover:text-red-400 hover:bg-gray-700/50'
-            : 'bg-white/50 text-gray-600 hover:text-red-500 hover:bg-white/80'
+            ? 'bg-gray-800/50 text-red-500 hover:bg-gray-700/50'
+            : 'bg-white/50 text-red-500 hover:bg-white/80'
             } shadow-lg border ${isDark ? 'border-gray-700' : 'border-white/20'
             }`}
           title="Sign Out"
