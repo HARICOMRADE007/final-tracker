@@ -1,4 +1,3 @@
-```
 import React from 'react';
 import { ArrowRight, Shield, Zap, PieChart } from 'lucide-react';
 
@@ -9,9 +8,8 @@ interface LandingPageProps {
 
 export default function LandingPage({ onGetStarted, isDark }: LandingPageProps) {
     return (
-        <div className={`min - h - screen flex flex - col items - center justify - center p - 4 transition - colors duration - 300 ${
-    isDark ? 'bg-gray-900 text-white' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50 text-gray-900'
-} `}>
+        <div className={`min-h-screen flex flex-col items-center justify-center p-4 transition-colors duration-300 ${isDark ? 'bg-gray-900 text-white' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50 text-gray-900'
+            } `}>
 
             {/* Hero Section */}
             <div className="max-w-4xl w-full text-center space-y-8 animate-fade-in-up">
@@ -23,7 +21,7 @@ export default function LandingPage({ onGetStarted, isDark }: LandingPageProps) 
                         <br />
                         Control Your Future
                     </h1>
-                    <p className={`text - xl md: text - 2xl max - w - 2xl mx - auto ${ isDark ? 'text-gray-400' : 'text-gray-600' } `}>
+                    <p className={`text-xl md:text-2xl max-w-2xl mx-auto ${isDark ? 'text-gray-400' : 'text-gray-600'} `}>
                         The smart, secure, and real-time way to track expenses across all your devices.
                     </p>
                 </div>
@@ -64,16 +62,15 @@ export default function LandingPage({ onGetStarted, isDark }: LandingPageProps) 
 
 function FeatureCard({ icon, title, description, isDark }: { icon: React.ReactNode, title: string, description: string, isDark: boolean }) {
     return (
-        <div className={`p - 6 rounded - 2xl backdrop - blur - xl border transition - all hover: y - [-5px] ${
-    isDark
-        ? 'bg-gray-800/50 border-gray-700 hover:bg-gray-800'
-        : 'bg-white/50 border-white/20 hover:bg-white shadow-lg'
-} `}>
+        <div className={`p-6 rounded-2xl backdrop-blur-xl border transition-all hover:-translate-y-1 ${isDark
+                ? 'bg-gray-800/50 border-gray-700 hover:bg-gray-800'
+                : 'bg-white/50 border-white/20 hover:bg-white shadow-lg'
+            } `}>
             <div className="mb-4 p-3 bg-opacity-10 rounded-xl inline-block">
                 {icon}
             </div>
             <h3 className="text-xl font-bold mb-2">{title}</h3>
-            <p className={`leading - relaxed ${ isDark ? 'text-gray-400' : 'text-gray-600' } `}>
+            <p className={`leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-600'} `}>
                 {description}
             </p>
         </div>

@@ -11,10 +11,9 @@ import Filters from './components/Filters';
 import ThemeToggle from './components/ThemeToggle';
 import { CategoryPieChart, CategoryBarChart, TrendLineChart } from './components/Charts';
 import { filterExpenses, getTotal, getTodayTotal } from './utils/helpers';
+import LandingPage from './components/LandingPage';
 
 const THEME_KEY = 'expense-tracker-theme';
-
-import LandingPage from './components/LandingPage';
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -23,6 +22,10 @@ function App() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [filters, setFilters] = useState<ExpenseFilters>({});
   const [isDark, setIsDark] = useState(false);
+
+  const filteredExpenses = filterExpenses(expenses, filters);
+  const totalExpenses = getTotal(filteredExpenses);
+  const todayExpenses = getTodayTotal(filteredExpenses);
 
   const handleExport = () => {
     if (expenses.length === 0) return;
@@ -179,10 +182,6 @@ function App() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
   };
-
-  const filteredExpenses = filterExpenses(expenses, filters);
-  const totalExpenses = getTotal(filteredExpenses);
-  const todayExpenses = getTodayTotal(filteredExpenses);
 
   if (loading) {
     return (

@@ -10,6 +10,7 @@ export type ExpenseCategory =
 
 export interface Expense {
   id: string;
+  user_id: string;
   amount: number;
   category: ExpenseCategory;
   date: string;
