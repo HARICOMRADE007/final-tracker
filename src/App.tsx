@@ -78,15 +78,30 @@ function App() {
             setExpenses((prev) => {
               // Prevent duplicate insertion from optimistic update
               if (prev.some(e => e.id === payload.new.id)) return prev;
-              return [...prev, payload.new as Expense];
+
+              // Fix: Parse numeric fields from string (Supabase JSON) to number
+              const newExpense = {
+                ...payload.new,
+                amount: Number(payload.new.amount),
+                createdAt: Number(payload.new.createdAt)
+              } as Expense;
+
+              return [...prev, newExpense];
             });
           } else if (payload.eventType === 'DELETE') {
             setExpenses((prev) => prev.filter((expense) => expense.id !== payload.old.id));
           } else if (payload.eventType === 'UPDATE') {
             setExpenses((prev) =>
-              prev.map((expense) =>
-                expense.id === payload.new.id ? (payload.new as Expense) : expense
-              )
+              prev.map((expense) => {
+                if (expense.id === payload.new.id) {
+                  return {
+                    ...payload.new,
+                    amount: Number(payload.new.amount),
+                    createdAt: Number(payload.new.createdAt)
+                  } as Expense;
+                }
+                return expense;
+              })
             );
           }
         }
@@ -179,12 +194,12 @@ function App() {
         : 'bg-gradient-to-br from-blue-50 via-white to-green-50'
         }`}
     >
-      <div className="absolute top-4 w-full px-4 flex justify-between items-center z-50 pointer-events-none">
-        <div className="pointer-events-auto">
+      <div className="w-full px-4 sm:px-8 py-4 flex justify-between items-center z-50">
+        <div>
           <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
         </div>
 
-        <div className="pointer-events-auto">
+        <div>
           <button
             onClick={handleLogout}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl backdrop-blur-md transition-all duration-300 ${isDark
@@ -200,7 +215,7 @@ function App() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-7xl">
+      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-8 max-w-7xl">
         <header className="mb-8 sm:mb-12 text-center">
           <h1
             className={`text-4xl sm:text-5xl lg:text-6xl font-bold mb-3 bg-gradient-to-r from-blue-500 via-green-500 to-cyan-500 bg-clip-text text-transparent animate-gradient`}
