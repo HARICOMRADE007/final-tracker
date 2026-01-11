@@ -20,6 +20,7 @@ function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [showLogin, setShowLogin] = useState(false); // New state for Landing Page
+  const [userName, setUserName] = useState(''); // Store user name
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [filters, setFilters] = useState<ExpenseFilters>({});
   const [isDark, setIsDark] = useState(false);

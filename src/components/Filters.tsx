@@ -1,14 +1,15 @@
-import { Filter, X } from 'lucide-react';
+import { Filter, X, Download } from 'lucide-react';
 import type { ExpenseCategory, ExpenseFilters } from '../types/expense';
 import { CATEGORIES } from '../utils/constants';
 
 interface FiltersProps {
   filters: ExpenseFilters;
   onFilterChange: (filters: ExpenseFilters) => void;
+  onExport: () => void;
   isDark: boolean;
 }
 
-export default function Filters({ filters, onFilterChange, isDark }: FiltersProps) {
+export default function Filters({ filters, onFilterChange, onExport, isDark }: FiltersProps) {
   const hasActiveFilters = filters.category || filters.startDate || filters.endDate;
 
   const clearFilters = () => {
@@ -17,11 +18,10 @@ export default function Filters({ filters, onFilterChange, isDark }: FiltersProp
 
   return (
     <div
-      className={`${
-        isDark
-          ? 'bg-gray-800/50 border-gray-700'
-          : 'bg-white/70 border-white/20'
-      } backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-xl border`}
+      className={`${isDark
+        ? 'bg-gray-800/50 border-gray-700'
+        : 'bg-white/70 border-white/20'
+        } backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-xl border`}
     >
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
@@ -30,15 +30,28 @@ export default function Filters({ filters, onFilterChange, isDark }: FiltersProp
             Filters
           </h2>
         </div>
-        {hasActiveFilters && (
+        <div className="flex items-center gap-2">
           <button
-            onClick={clearFilters}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-500 text-sm font-medium transition-all duration-200"
+            onClick={onExport}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-200 ${isDark
+                ? 'bg-green-600/20 text-green-400 border-green-500/30 hover:bg-green-600/30'
+                : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100'
+              }`}
           >
-            <X size={16} />
-            Clear
+            <Download size={16} />
+            <span className="text-sm font-medium">Export</span>
           </button>
-        )}
+
+          {hasActiveFilters && (
+            <button
+              onClick={clearFilters}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-500 text-sm font-medium transition-all duration-200"
+            >
+              <X size={16} />
+              Clear
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -54,11 +67,10 @@ export default function Filters({ filters, onFilterChange, isDark }: FiltersProp
                 category: e.target.value ? (e.target.value as ExpenseCategory) : undefined,
               })
             }
-            className={`w-full px-4 py-3 rounded-xl border ${
-              isDark
-                ? 'bg-gray-900/50 border-gray-700 text-white'
-                : 'bg-white/50 border-gray-200 text-gray-900'
-            } focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200`}
+            className={`w-full px-4 py-3 rounded-xl border ${isDark
+              ? 'bg-gray-900/50 border-gray-700 text-white'
+              : 'bg-white/50 border-gray-200 text-gray-900'
+              } focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200`}
           >
             <option value="">All Categories</option>
             {CATEGORIES.map((cat) => (
@@ -82,11 +94,10 @@ export default function Filters({ filters, onFilterChange, isDark }: FiltersProp
                 startDate: e.target.value || undefined,
               })
             }
-            className={`w-full px-4 py-3 rounded-xl border ${
-              isDark
-                ? 'bg-gray-900/50 border-gray-700 text-white'
-                : 'bg-white/50 border-gray-200 text-gray-900'
-            } focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200`}
+            className={`w-full px-4 py-3 rounded-xl border ${isDark
+              ? 'bg-gray-900/50 border-gray-700 text-white'
+              : 'bg-white/50 border-gray-200 text-gray-900'
+              } focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200`}
           />
         </div>
 
@@ -103,11 +114,10 @@ export default function Filters({ filters, onFilterChange, isDark }: FiltersProp
                 endDate: e.target.value || undefined,
               })
             }
-            className={`w-full px-4 py-3 rounded-xl border ${
-              isDark
-                ? 'bg-gray-900/50 border-gray-700 text-white'
-                : 'bg-white/50 border-gray-200 text-gray-900'
-            } focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200`}
+            className={`w-full px-4 py-3 rounded-xl border ${isDark
+              ? 'bg-gray-900/50 border-gray-700 text-white'
+              : 'bg-white/50 border-gray-200 text-gray-900'
+              } focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200`}
           />
         </div>
       </div>
