@@ -69,7 +69,8 @@ function App() {
           event: '*',
           schema: 'public',
           table: 'expenses',
-          filter: `user_id=eq.${session.user.id}`,
+          // Removed client-side filter to rely on RLS policies for broadcasting.
+          // This often fixes issues where the filter string string doesn't match perfectly.
         },
         (payload) => {
           console.log('Realtime event received:', payload); // Debug log
@@ -120,8 +121,6 @@ function App() {
     setExpenses((prev) => [...prev, newExpense]);
 
     // 2. Database Insert
-    // We insert a cleaned object without the ID if we want DB to generate it, 
-    // OR we generate a valid UUID here. We are generating one.
     const { error } = await supabase.from('expenses').insert([newExpense]);
 
     if (error) {
@@ -180,19 +179,25 @@ function App() {
         : 'bg-gradient-to-br from-blue-50 via-white to-green-50'
         }`}
     >
-      <div className="absolute top-4 right-4 flex items-center gap-4 z-50">
-        <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
-        <button
-          onClick={handleLogout}
-          className={`p-2 rounded-full backdrop-blur-md transition-all duration-300 ${isDark
-            ? 'bg-gray-800/50 text-red-500 hover:bg-gray-700/50'
-            : 'bg-white/50 text-red-500 hover:bg-white/80'
-            } shadow-lg border ${isDark ? 'border-gray-700' : 'border-white/20'
-            }`}
-          title="Sign Out"
-        >
-          <LogOut size={20} />
-        </button>
+      <div className="absolute top-4 w-full px-4 flex justify-between items-center z-50 pointer-events-none">
+        <div className="pointer-events-auto">
+          <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
+        </div>
+
+        <div className="pointer-events-auto">
+          <button
+            onClick={handleLogout}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl backdrop-blur-md transition-all duration-300 ${isDark
+              ? 'bg-gray-800/50 text-red-500 hover:bg-gray-700/50'
+              : 'bg-white/50 text-red-600 hover:bg-white/80'
+              } shadow-lg border ${isDark ? 'border-gray-700' : 'border-white/20'
+              } hover:scale-105 active:scale-95`}
+            title="Sign Out"
+          >
+            <span className="font-semibold">Logout</span>
+            <LogOut size={20} />
+          </button>
+        </div>
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-7xl">
