@@ -240,7 +240,7 @@ function App() {
             Expense Tracker
           </h1>
           <p className={`text-lg ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-            Welcome, {session.user.email}
+            Welcome, {userName || session.user.email}
           </p>
         </header>
 
@@ -251,20 +251,12 @@ function App() {
 
           <div className="lg:col-span-2 space-y-6 sm:space-y-8">
             <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
-                <Filters filters={filters} onFilterChange={setFilters} isDark={isDark} />
-
-                <button
-                  onClick={() => import('./utils/export').then(mod => mod.exportToExcel(filteredExpenses, `expenses-${new Date().toISOString().split('T')[0]}.xlsx`))}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-300 ${isDark
-                    ? 'bg-green-600/20 text-green-400 hover:bg-green-600/30 border-green-500/30'
-                    : 'bg-green-50 text-green-600 hover:bg-green-100 border-green-200'
-                    } border shadow-sm hover:scale-105 active:scale-95`}
-                >
-                  <Download size={18} />
-                  <span className="font-medium">Export Excel</span>
-                </button>
-              </div>
+              <Filters
+                filters={filters}
+                onFilterChange={setFilters}
+                onExport={handleExport}
+                isDark={isDark}
+              />
 
               <DashboardStats
                 total={totalExpenses}
