@@ -1,23 +1,17 @@
+```
 import React from 'react';
 import { ArrowRight, Shield, Zap, PieChart } from 'lucide-react';
 
 interface LandingPageProps {
-    onGetStarted: (name: string) => void;
+    onGetStarted: () => void;
     isDark: boolean;
 }
 
 export default function LandingPage({ onGetStarted, isDark }: LandingPageProps) {
-    const [name, setName] = React.useState('');
-
-    const handleSubmit = () => {
-        if (name.trim()) {
-            onGetStarted(name);
-        }
-    }
-
     return (
-        <div className={`min-h-screen flex flex-col items-center justify-center p-4 transition-colors duration-300 ${isDark ? 'bg-gray-900 text-white' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50 text-gray-900'
-            }`}>
+        <div className={`min - h - screen flex flex - col items - center justify - center p - 4 transition - colors duration - 300 ${
+    isDark ? 'bg-gray-900 text-white' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50 text-gray-900'
+} `}>
 
             {/* Hero Section */}
             <div className="max-w-4xl w-full text-center space-y-8 animate-fade-in-up">
@@ -29,32 +23,18 @@ export default function LandingPage({ onGetStarted, isDark }: LandingPageProps) 
                         <br />
                         Control Your Future
                     </h1>
-                    <p className={`text-xl md:text-2xl max-w-2xl mx-auto ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <p className={`text - xl md: text - 2xl max - w - 2xl mx - auto ${ isDark ? 'text-gray-400' : 'text-gray-600' } `}>
                         The smart, secure, and real-time way to track expenses across all your devices.
                     </p>
                 </div>
 
-                <div className="flex flex-col items-center gap-4 max-w-sm mx-auto w-full">
-                    <input
-                        type="text"
-                        placeholder="Enter your name to begin..."
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className={`w-full px-6 py-4 rounded-full text-lg border outline-none focus:ring-4 transition-all ${isDark
-                                ? 'bg-gray-800 border-gray-700 focus:ring-blue-500/20 text-white placeholder-gray-500'
-                                : 'bg-white border-gray-200 focus:ring-blue-500/20 text-gray-900'
-                            }`}
-                        onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-                    />
-                    <button
-                        onClick={handleSubmit}
-                        disabled={!name.trim()}
-                        className="w-full group relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-blue-600 text-white rounded-full text-lg font-semibold hover:bg-blue-700 transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-blue-500/30 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
-                    >
-                        Get Started Now
-                        <ArrowRight className="group-hover:translate-x-1 transition-transform" />
-                    </button>
-                </div>
+                <button
+                    onClick={onGetStarted}
+                    className="group relative inline-flex items-center gap-3 px-8 py-4 bg-blue-600 text-white rounded-full text-lg font-semibold hover:bg-blue-700 transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-blue-500/30"
+                >
+                    Get Started Now
+                    <ArrowRight className="group-hover:translate-x-1 transition-transform" />
+                </button>
             </div>
 
             {/* Features Grid */}
@@ -84,15 +64,16 @@ export default function LandingPage({ onGetStarted, isDark }: LandingPageProps) 
 
 function FeatureCard({ icon, title, description, isDark }: { icon: React.ReactNode, title: string, description: string, isDark: boolean }) {
     return (
-        <div className={`p-6 rounded-2xl backdrop-blur-xl border transition-all hover:y-[-5px] ${isDark
-            ? 'bg-gray-800/50 border-gray-700 hover:bg-gray-800'
-            : 'bg-white/50 border-white/20 hover:bg-white shadow-lg'
-            }`}>
+        <div className={`p - 6 rounded - 2xl backdrop - blur - xl border transition - all hover: y - [-5px] ${
+    isDark
+        ? 'bg-gray-800/50 border-gray-700 hover:bg-gray-800'
+        : 'bg-white/50 border-white/20 hover:bg-white shadow-lg'
+} `}>
             <div className="mb-4 p-3 bg-opacity-10 rounded-xl inline-block">
                 {icon}
             </div>
             <h3 className="text-xl font-bold mb-2">{title}</h3>
-            <p className={`leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+            <p className={`leading - relaxed ${ isDark ? 'text-gray-400' : 'text-gray-600' } `}>
                 {description}
             </p>
         </div>

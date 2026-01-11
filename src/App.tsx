@@ -19,11 +19,17 @@ import LandingPage from './components/LandingPage';
 function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showLogin, setShowLogin] = useState(false); // New state for Landing Page
-  const [userName, setUserName] = useState(''); // Store user name
+  const [showLogin, setShowLogin] = useState(false);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [filters, setFilters] = useState<ExpenseFilters>({});
   const [isDark, setIsDark] = useState(false);
+
+  const handleExport = () => {
+    if (expenses.length === 0) return;
+    const dataToExport = filteredExpenses.length > 0 ? filteredExpenses : expenses;
+    import('./utils/export').then(mod => mod.exportToExcel(dataToExport, `expenses-${new Date().toISOString().split('T')[0]}.xlsx`));
+  };
+
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -240,7 +246,7 @@ function App() {
             Expense Tracker
           </h1>
           <p className={`text-lg ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-            Welcome, {userName || session.user.email}
+            Welcome, {session.user.email}
           </p>
         </header>
 
