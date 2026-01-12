@@ -43,8 +43,6 @@ function App() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log('Auth Event:', _event); // Debug logging
-      console.log('Session State:', session ? 'Active' : 'Null'); // Debug logging
       setSession(session);
     });
 
