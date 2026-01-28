@@ -20,7 +20,12 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [showLogin, setShowLogin] = useState(false);
   const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [filters, setFilters] = useState<ExpenseFilters>({});
+  const [filters, setFilters] = useState<ExpenseFilters>(() => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    return { startDate: `${year}-${month}-01` };
+  });
   const [isDark, setIsDark] = useState(false);
 
   const filteredExpenses = filterExpenses(expenses, filters);
