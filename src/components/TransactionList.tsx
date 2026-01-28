@@ -71,7 +71,7 @@ export default function TransactionList({
               className={`${isDark
                 ? 'bg-gray-900/50 hover:bg-gray-900/70'
                 : 'bg-white/50 hover:bg-white/70'
-                } rounded-xl p-4 transition-all duration-200 hover:shadow-lg group ${expense.category === 'Others' ? 'border-2 border-yellow-500 animate-pulse-border' : ''
+                } rounded-xl p-4 transition-all duration-200 hover:shadow-lg group ${expense.category === 'Others' ? 'border-2 border-yellow-500/50 bg-yellow-50/10' : ''
                 }`}
             >
               <div className="flex items-center gap-4">
