@@ -14,16 +14,17 @@ export default function TransactionList({
   onDelete,
   isDark,
 }: TransactionListProps) {
-  const sortedExpenses = [...expenses].sort((a, b) => b.createdAt - a.createdAt);
+  const sortedExpenses = [...expenses]
+    .sort((a, b) => b.createdAt - a.createdAt)
+    .slice(0, 25);
 
   if (expenses.length === 0) {
     return (
       <div
-        className={`${
-          isDark
-            ? 'bg-gray-800/50 border-gray-700'
-            : 'bg-white/70 border-white/20'
-        } backdrop-blur-xl rounded-3xl p-12 shadow-xl border text-center`}
+        className={`${isDark
+          ? 'bg-gray-800/50 border-gray-700'
+          : 'bg-white/70 border-white/20'
+          } backdrop-blur-xl rounded-3xl p-12 shadow-xl border text-center`}
       >
         <div className="flex flex-col items-center gap-4">
           <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center">
@@ -44,11 +45,10 @@ export default function TransactionList({
 
   return (
     <div
-      className={`${
-        isDark
-          ? 'bg-gray-800/50 border-gray-700'
-          : 'bg-white/70 border-white/20'
-      } backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-xl border`}
+      className={`${isDark
+        ? 'bg-gray-800/50 border-gray-700'
+        : 'bg-white/70 border-white/20'
+        } backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-xl border`}
     >
       <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-blue-500 to-green-500 bg-clip-text text-transparent">
         Recent Transactions
@@ -56,8 +56,8 @@ export default function TransactionList({
 
       <div className="space-y-3">
         {sortedExpenses.map((expense) => {
-          const Icon = CATEGORY_ICONS[expense.category];
-          const color = CATEGORY_COLORS[expense.category];
+          const Icon = CATEGORY_ICONS[expense.category] || CATEGORY_ICONS['Food'];
+          const color = CATEGORY_COLORS[expense.category] || CATEGORY_COLORS['Food'];
           const date = new Date(expense.date);
           const formattedDate = date.toLocaleDateString('en-US', {
             month: 'short',
@@ -68,11 +68,10 @@ export default function TransactionList({
           return (
             <div
               key={expense.id}
-              className={`${
-                isDark
-                  ? 'bg-gray-900/50 hover:bg-gray-900/70'
-                  : 'bg-white/50 hover:bg-white/70'
-              } rounded-xl p-4 transition-all duration-200 hover:shadow-lg group`}
+              className={`${isDark
+                ? 'bg-gray-900/50 hover:bg-gray-900/70'
+                : 'bg-white/50 hover:bg-white/70'
+                } rounded-xl p-4 transition-all duration-200 hover:shadow-lg group`}
             >
               <div className="flex items-center gap-4">
                 <div
