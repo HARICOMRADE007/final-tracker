@@ -22,6 +22,7 @@ function App() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [filters, setFilters] = useState<ExpenseFilters>({});
   const [isDark, setIsDark] = useState(false);
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
 
   const filteredExpenses = filterExpenses(expenses, filters);
   const totalExpenses = getTotal(filteredExpenses);
@@ -175,6 +176,42 @@ function App() {
     }
   };
 
+  const handleUpdateExpense = async (updatedData: {
+    amount: number;
+    category: ExpenseCategory;
+    date: string;
+    note?: string;
+  }) => {
+    if (!editingExpense || !session?.user) return;
+
+    const updatedExpense: Expense = {
+      ...editingExpense,
+      ...updatedData,
+    };
+
+    // 1. Optimistic Update
+    const prevExpenses = [...expenses];
+    setExpenses(prev => prev.map(e => e.id === updatedExpense.id ? updatedExpense : e));
+    setEditingExpense(null); // Close edit form
+
+    // 2. Database Update
+    const { error } = await supabase
+      .from('expenses')
+      .update({
+        amount: updatedData.amount,
+        category: updatedData.category,
+        date: updatedData.date,
+        note: updatedData.note
+      })
+      .eq('id', updatedExpense.id);
+
+    if (error) {
+      console.error("Error updating expense:", error);
+      alert("Failed to update expense");
+      setExpenses(prevExpenses);
+    }
+  };
+
   const toggleTheme = () => {
     setIsDark((prev) => !prev);
   };
@@ -251,7 +288,15 @@ function App() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           <div className="lg:col-span-1 space-y-6">
-            <ExpenseForm onAddExpense={addExpense} isDark={isDark} />
+            <div className="lg:col-span-1 space-y-6">
+              <ExpenseForm
+                onAddExpense={addExpense}
+                onUpdateExpense={handleUpdateExpense}
+                initialData={editingExpense}
+                onCancel={() => setEditingExpense(null)}
+                isDark={isDark}
+              />
+            </div>
           </div>
 
           <div className="lg:col-span-2 space-y-6 sm:space-y-8">
@@ -312,6 +357,7 @@ function App() {
             <TransactionList
               expenses={filteredExpenses}
               onDelete={deleteExpense}
+              onEdit={setEditingExpense}
               isDark={isDark}
             />
           </div>

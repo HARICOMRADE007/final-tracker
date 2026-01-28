@@ -6,12 +6,14 @@ import { formatCurrency } from '../utils/helpers';
 interface TransactionListProps {
   expenses: Expense[];
   onDelete: (id: string) => void;
+  onEdit: (expense: Expense) => void;
   isDark: boolean;
 }
 
 export default function TransactionList({
   expenses,
   onDelete,
+  onEdit,
   isDark,
 }: TransactionListProps) {
   const sortedExpenses = [...expenses].sort((a, b) => b.createdAt - a.createdAt);
@@ -19,11 +21,10 @@ export default function TransactionList({
   if (expenses.length === 0) {
     return (
       <div
-        className={`${
-          isDark
-            ? 'bg-gray-800/50 border-gray-700'
-            : 'bg-white/70 border-white/20'
-        } backdrop-blur-xl rounded-3xl p-12 shadow-xl border text-center`}
+        className={`${isDark
+          ? 'bg-gray-800/50 border-gray-700'
+          : 'bg-white/70 border-white/20'
+          } backdrop-blur-xl rounded-3xl p-12 shadow-xl border text-center`}
       >
         <div className="flex flex-col items-center gap-4">
           <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center">
@@ -44,11 +45,10 @@ export default function TransactionList({
 
   return (
     <div
-      className={`${
-        isDark
-          ? 'bg-gray-800/50 border-gray-700'
-          : 'bg-white/70 border-white/20'
-      } backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-xl border`}
+      className={`${isDark
+        ? 'bg-gray-800/50 border-gray-700'
+        : 'bg-white/70 border-white/20'
+        } backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-xl border`}
     >
       <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-blue-500 to-green-500 bg-clip-text text-transparent">
         Recent Transactions
@@ -68,11 +68,11 @@ export default function TransactionList({
           return (
             <div
               key={expense.id}
-              className={`${
-                isDark
-                  ? 'bg-gray-900/50 hover:bg-gray-900/70'
-                  : 'bg-white/50 hover:bg-white/70'
-              } rounded-xl p-4 transition-all duration-200 hover:shadow-lg group`}
+              className={`${isDark
+                ? 'bg-gray-900/50 hover:bg-gray-900/70'
+                : 'bg-white/50 hover:bg-white/70'
+                } rounded-xl p-4 transition-all duration-200 hover:shadow-lg group ${expense.category === 'Others' ? 'border-2 border-yellow-500 animate-pulse-border' : ''
+                }`}
             >
               <div className="flex items-center gap-4">
                 <div
@@ -85,9 +85,16 @@ export default function TransactionList({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                        {expense.category}
-                      </h3>
+                      <div className="flex items-center gap-2">
+                        <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                          {expense.category}
+                        </h3>
+                        {expense.category === 'Others' && (
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 border border-yellow-200 font-medium">
+                            Review Needed
+                          </span>
+                        )}
+                      </div>
                       <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                         {formattedDate}
                       </p>
@@ -102,6 +109,13 @@ export default function TransactionList({
                       <p className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'} whitespace-nowrap`}>
                         {formatCurrency(expense.amount)}
                       </p>
+                      <button
+                        onClick={() => onEdit(expense)}
+                        className="opacity-0 group-hover:opacity-100 p-2 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-500 transition-all duration-200"
+                        aria-label="Edit expense"
+                      >
+                        <Icon size={18} />
+                      </button>
                       <button
                         onClick={() => onDelete(expense.id)}
                         className="opacity-0 group-hover:opacity-100 p-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-500 transition-all duration-200"
