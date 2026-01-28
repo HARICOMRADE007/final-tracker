@@ -12,9 +12,12 @@
 
 @layer utilities {
   @keyframes gradient {
-    0%, 100% {
+
+    0%,
+    100% {
       background-position: 0% 50%;
     }
+
     50% {
       background-position: 100% 50%;
     }
@@ -26,9 +29,12 @@
   }
 
   @keyframes pulse-border {
-    0%, 100% {
+
+    0%,
+    100% {
       border-color: rgba(234, 179, 8, 1);
     }
+
     50% {
       border-color: rgba(234, 179, 8, 0.4);
     }
@@ -36,5 +42,29 @@
 
   .animate-pulse-border {
     animation: pulse-border 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .animate-pulse-border {
+    animation: pulse-border 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+@layer utilities {
+  .touch-pan-y {
+    touch-action: pan-y;
+  }
+
+  /* Prevent chart scroll trapping and reduce flicker */
+  canvas {
+    touch-action: pan-y !important;
+    max-width: 100%;
+  }
+
+  /* Optimize backdrop blur for mobile */
+  .safe-backdrop {
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    will-change: transform;
+    transform: translateZ(0);
   }
 }

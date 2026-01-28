@@ -319,9 +319,9 @@ function App() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div
                 className={`${isDark
-                  ? 'bg-gray-800/50 border-gray-700'
-                  : 'bg-white/70 border-white/20'
-                  } backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-xl border`}
+                  ? 'bg-gray-800/80 border-gray-700'
+                  : 'bg-white/80 border-white/20'
+                  } backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-xl border overflow-hidden transform-gpu`}
               >
                 <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-blue-500 to-green-500 bg-clip-text text-transparent">
                   Category Breakdown
@@ -331,9 +331,9 @@ function App() {
 
               <div
                 className={`${isDark
-                  ? 'bg-gray-800/50 border-gray-700'
-                  : 'bg-white/70 border-white/20'
-                  } backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-xl border`}
+                  ? 'bg-gray-800/80 border-gray-700'
+                  : 'bg-white/80 border-white/20'
+                  } backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-xl border overflow-hidden transform-gpu`}
               >
                 <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-blue-500 to-green-500 bg-clip-text text-transparent">
                   Spending by Category
@@ -344,9 +344,9 @@ function App() {
 
             <div
               className={`${isDark
-                ? 'bg-gray-800/50 border-gray-700'
-                : 'bg-white/70 border-white/20'
-                } backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-xl border`}
+                ? 'bg-gray-800/80 border-gray-700'
+                : 'bg-white/80 border-white/20'
+                } backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-xl border overflow-hidden transform-gpu`}
             >
               <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-blue-500 to-green-500 bg-clip-text text-transparent">
                 7-Day Spending Trend
